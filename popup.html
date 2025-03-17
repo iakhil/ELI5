@@ -1,13 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>ELI5 Buddy</title>
-  <script src="popup.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>ELI5 Buddy</h1>
-  <p>Highlight some text on the page and click the button below!</p>
-  <button id="eli5Button">Explain it like I'm five!</button>
-  <div id="explanation"></div>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <i class="fas fa-lightbulb"></i>
+        <h1>ELI5 Buddy</h1>
+      </div>
+      <p class="tagline">Complex ideas, explained simply!</p>
+    </header>
+    
+    <div class="tabs">
+      <button id="explainTab" class="tab-button active">
+        <i class="fas fa-child"></i> Explain
+      </button>
+      <button id="flashcardsTab" class="tab-button">
+        <i class="fas fa-clone"></i> Flashcards
+      </button>
+    </div>
+    
+    <main>
+      <!-- Explain Mode -->
+      <div id="explainMode" class="tab-content active">
+        <div class="instruction-box">
+          <p><i class="fas fa-highlighter"></i> Highlight text on any webpage</p>
+          <p><i class="fas fa-mouse-pointer"></i> Click the button below</p>
+          <p><i class="fas fa-magic"></i> Get a simple explanation!</p>
+        </div>
+        
+        <button id="eli5Button" class="primary-button">
+          <i class="fas fa-child"></i> Explain Like I'm Five!
+        </button>
+        
+        <div class="result-area">
+          <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Generating simple explanation...</p>
+          </div>
+          
+          <div id="explanation-container" class="hidden">
+            <div class="explanation-header">
+              <h2>Your Explanation:</h2>
+              <button id="copyButton" class="icon-button" title="Copy to clipboard">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+            <div id="explanation" class="explanation-content"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Flashcards Mode -->
+      <div id="flashcardsMode" class="tab-content">
+        <div class="instruction-box">
+          <p><i class="fas fa-highlighter"></i> Highlight text on any webpage</p>
+          <p><i class="fas fa-mouse-pointer"></i> Click the button below</p>
+          <p><i class="fas fa-clone"></i> Get flashcards for memorization!</p>
+        </div>
+        
+        <div class="flashcard-options">
+          <div class="option-group">
+            <label for="cardCount">Number of cards:</label>
+            <select id="cardCount" class="select-input">
+              <option value="3">3</option>
+              <option value="5" selected>5</option>
+              <option value="7">7</option>
+              <option value="10">10</option>
+            </select>
+          </div>
+          
+          <div class="option-group">
+            <label for="cardDifficulty">Difficulty:</label>
+            <select id="cardDifficulty" class="select-input">
+              <option value="basic">Basic</option>
+              <option value="intermediate" selected>Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+        </div>
+        
+        <button id="generateFlashcardsButton" class="primary-button">
+          <i class="fas fa-clone"></i> Generate Flashcards
+        </button>
+        
+        <div class="result-area">
+          <div id="flashcards-loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Generating flashcards...</p>
+          </div>
+          
+          <div id="flashcards-container" class="hidden">
+            <div class="flashcards-header">
+              <h2>Your Flashcards:</h2>
+              <div class="flashcard-controls">
+                <button id="downloadFlashcardsButton" class="icon-button" title="Download as CSV">
+                  <i class="fas fa-download"></i>
+                </button>
+                <button id="copyFlashcardsButton" class="icon-button" title="Copy all flashcards">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div id="flashcards-list" class="flashcards-content">
+              <!-- Flashcards will be inserted here -->
+            </div>
+            
+            <div class="flashcard-navigation hidden" id="flashcard-navigation">
+              <button id="prevCardButton" class="nav-button" disabled>
+                <i class="fas fa-chevron-left"></i> Previous
+              </button>
+              <span id="cardCounter">Card 1 of 5</span>
+              <button id="nextCardButton" class="nav-button">
+                Next <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <footer>
+      <p>Powered by OpenAI</p>
+    </footer>
+  </div>
+  
+  <script src="popup.js"></script>
 </body>
 </html>
