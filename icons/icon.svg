@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3a86ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8338ec;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <circle cx="64" cy="64" r="60" fill="url(#grad1)" />
+  <circle cx="64" cy="64" r="50" fill="white" opacity="0.9" />
+  <g transform="translate(32, 40)">
+    <path d="M10,0 L54,0 C59.5228,0 64,4.47715 64,10 L64,38 C64,43.5228 59.5228,48 54,48 L10,48 C4.47715,48 0,43.5228 0,38 L0,10 C0,4.47715 4.47715,0 10,0 Z" fill="#3a86ff" />
+    <text x="32" y="30" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="white">ELI5</text>
+  </g>
+  <circle cx="95" cy="40" r="15" fill="#ffc107" />
+  <path d="M95,30 Q105,35 95,45 Q85,35 95,30" fill="white" />
+</svg> 

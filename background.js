@@ -1,5 +1,6 @@
 const OPENAI_API_KEY = ''
 
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.text) {
     generateELI5Explanation(request.text, function(response) {
@@ -31,7 +32,7 @@ function generateELI5Explanation(text, callback) {
         "messages": [
           {
             "role": "system",
-            "content": "You are an expert teacher who can explain complex concepts easily."
+            "content": "You are an expert teacher who can explain complex concepts easily. Jump straight to the explanation, don't include any other text."
           },
           {
             "role": "user",
