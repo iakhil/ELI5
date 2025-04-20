@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.firebaseio.com https://*.googleapis.com; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://www.gstatic.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; script-src 'self' https://*.firebaseio.com https://*.googleapis.com https://www.gstatic.com 'unsafe-inline'; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com;">
+    <title>ELI5 Buddy - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-lightbulb"></i>
+            <h1>ELI5 Buddy</h1>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/pricing" class="nav-link">Pricing</a>
+            <a href="/diagnostic" class="nav-link">Diagnostic</a>
+            <div class="user-section">
+                <span id="userEmail" class="user-email"></span>
+                <button id="logoutButton" class="btn-outline">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>My Account</h1>
+            <div class="subscription-status">
+                <span id="subscriptionBadge" class="subscription-badge free">Free Plan</span>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Subscription Card -->
+            <div class="dashboard-card">
+                <h2><i class="fas fa-crown"></i> Subscription</h2>
+                <div class="subscription-info">
+                    <p>Current Plan: <span id="currentPlan">Free</span></p>
+                    <p>Status: <span id="subscriptionStatus">Active</span></p>
+                    <p>Next Billing: <span id="nextBilling">N/A</span></p>
+                </div>
+                <div class="subscription-actions">
+                    <button id="upgradeButton" class="btn-primary">Upgrade to Premium</button>
+                    <button id="manageSubscriptionButton" class="btn-outline">Manage Subscription</button>
+                </div>
+            </div>
+
+            <!-- Usage Stats Card -->
+            <div class="dashboard-card">
+                <h2><i class="fas fa-chart-bar"></i> Usage Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalExplanations">0</span>
+                        <span class="stat-label">Total Explanations</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalFlashcards">0</span>
+                        <span class="stat-label">Total Flashcards</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity Card -->
+            <div class="dashboard-card">
+                <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                <div id="recentActivity" class="recent-activity">
+                    <p class="empty-state">No recent activity</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Firebase SDKs -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+    
+    <!-- Stripe -->
+    <script src="https://js.stripe.com/v3/"></script>
+    
+    <!-- Pass server variables to client -->
+    <script>
+        window.appConfig = {
+            testMode: {% if test_mode %}true{% else %}false{% endif %},
+            stripeKey: "{{ stripe_publishable_key }}"
+        };
+    </script>
+    
+    <!-- Custom Scripts -->
+    <script type="module" src="{{ url_for('static', filename='js/firebase-config.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html> 

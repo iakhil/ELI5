@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ELI5 Buddy Premium</title>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+  <script>
+    const stripe = Stripe('your_publishable_key'); // Replace with your Stripe publishable key
+    
+    // Create a checkout session
+    fetch('https://your-api.com/create-checkout-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        priceId: 'your_price_id', // Replace with your Stripe price ID
+      }),
+    })
+    .then(response => response.json())
+    .then(session => {
+      return stripe.redirectToCheckout({ sessionId: session.id });
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  </script>
+</body>
+</html> 

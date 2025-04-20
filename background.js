@@ -1,44 +1,48 @@
-const OPENAI_API_KEY = ''
-
-
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.text) {
-    generateELI5Explanation(request.text, function(response) {
-      sendResponse({ explanation: response });
-    });
-    return true; // Required to use sendResponse asynchronously
+// Listen for messages from popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log('Received message in background:', request);
+  
+  if (!request.text) {
+    sendResponse({ error: 'No text provided' });
+    return true;
   }
+  
+  generateExplanation(request.text, sendResponse);
+  return true; // Keep the message channel open for async response
 });
 
-function generateELI5Explanation(text, callback) {
-  var xhr = new XMLHttpRequest();
-  xhr.open("POST", "https://api.openai.com/v1/chat/completions", true);
-  xhr.setRequestHeader("Content-Type", "application/json");
-  xhr.setRequestHeader("Authorization", "Bearer " + OPENAI_API_KEY);
+async function generateExplanation(text, sendResponse) {
+  console.log('Generating explanation for:', text.substring(0, 30) + '...');
+  try {
+    // Make request to your proxy server instead of directly to OpenAI
+    const response = await fetch('https://your-proxy-server.com/api/explain', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text: text
+      })
+    });
 
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        var response = JSON.parse(xhr.responseText);
-        callback(response);
-      } else {
-        callback(null);
-      }
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Failed to connect to server' }));
+      throw new Error(errorData.message || `Server error: ${response.status}`);
     }
-  };
-  
-    var requestData = {
-        "model": "gpt-3.5-turbo",
-        "messages": [
-          {
-            "role": "system",
-            "content": "You are an expert teacher who can explain complex concepts easily. Jump straight to the explanation, don't include any other text."
-          },
-          {
-            "role": "user",
-            "content": "ELI5 the following text: " + text
-          }
-        ]
-      }
-    xhr.send(JSON.stringify(requestData));
+
+    const data = await response.json();
+    console.log('API response received');
+    
+    if (data.error) {
+      console.error('API error:', data.error);
+      sendResponse({ error: data.error });
+      return;
+    }
+
+    console.log('Successfully generated explanation');
+    sendResponse({ explanation: data.explanation });
+  } catch (error) {
+    console.error('Error generating explanation:', error);
+    sendResponse({ error: error.message });
   }
+}

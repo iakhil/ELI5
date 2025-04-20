@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.firebaseio.com https://*.googleapis.com; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://www.gstatic.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; script-src 'self' https://*.firebaseio.com https://*.googleapis.com https://www.gstatic.com 'unsafe-inline'; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com;">
+    <title>ELI5 Buddy - Diagnostic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+    <style>
+        .diagnostic-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        
+        .section-title {
+            margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .status-success {
+            background-color: rgba(0, 184, 148, 0.2);
+            color: #00b894;
+        }
+        
+        .status-error {
+            background-color: rgba(214, 48, 49, 0.2);
+            color: #d63031;
+        }
+        
+        .status-warning {
+            background-color: rgba(253, 203, 110, 0.2);
+            color: #fdcb6e;
+        }
+        
+        .data-label {
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        pre {
+            background-color: #2d3436;
+            color: #dfe6e9;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: monospace;
+            margin: 0;
+        }
+        
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .refresh-btn {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .refresh-btn:hover {
+            background-color: #3367d6;
+        }
+        
+        #loading {
+            display: none;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top: 3px solid #4285f4;
+            border-radius: 50%;
+            width: .8em;
+            height: .8em;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-lightbulb"></i>
+            <h1>ELI5 Buddy</h1>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/dashboard" class="nav-link">Dashboard</a>
+            <a href="/pricing" class="nav-link">Pricing</a>
+        </div>
+    </nav>
+
+    <div class="diagnostic-container">
+        <h1>Subscription Status Diagnostic</h1>
+        
+        <div id="loading">
+            <p>Loading data... <div class="spinner"></div></p>
+        </div>
+        
+        <div id="authStatus" class="section">
+            <h2 class="section-title">
+                <i class="fas fa-user-shield"></i> Authentication Status
+                <span id="authStatusLabel" class="status">Checking...</span>
+            </h2>
+            <div id="authData"></div>
+        </div>
+        
+        <div id="subscriptionStatus" class="section">
+            <h2 class="section-title">
+                <i class="fas fa-crown"></i> Subscription Status
+                <span id="subscriptionStatusLabel" class="status">Checking...</span>
+            </h2>
+            <div id="subscriptionData"></div>
+        </div>
+        
+        <div id="apiStatus" class="section">
+            <h2 class="section-title">
+                <i class="fas fa-exchange-alt"></i> API Status Check
+                <span id="apiStatusLabel" class="status">Checking...</span>
+            </h2>
+            <div id="apiData"></div>
+        </div>
+        
+        <div id="rawData" class="section">
+            <h2 class="section-title">
+                <i class="fas fa-code"></i> Raw User Data
+            </h2>
+            <pre id="userData">Loading...</pre>
+        </div>
+        
+        <div class="action-buttons">
+            <button id="refreshButton" class="refresh-btn">
+                <i class="fas fa-sync-alt"></i> Refresh Data
+            </button>
+            <button id="fixButton" class="refresh-btn">
+                <i class="fas fa-wrench"></i> Fix Subscription
+            </button>
+            <a href="/create-user-document" class="refresh-btn" style="text-decoration: none; background-color: #34a853;">
+                <i class="fas fa-user-plus"></i> Create User Document
+            </a>
+            <a href="/quickfix" class="refresh-btn" style="text-decoration: none;">
+                <i class="fas fa-magic"></i> Quick Fix (No Firebase)
+            </a>
+            <a href="/firebase-setup" class="refresh-btn" style="text-decoration: none; background-color: #f57c00;">
+                <i class="fas fa-fire"></i> Firebase Setup Guide
+            </a>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script type="module">
+        import { auth, db } from '/static/js/firebase-config.js';
+        import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        
+        // DOM Elements
+        const authStatusLabel = document.getElementById('authStatusLabel');
+        const authDataElement = document.getElementById('authData');
+        const subscriptionStatusLabel = document.getElementById('subscriptionStatusLabel');
+        const subscriptionDataElement = document.getElementById('subscriptionData');
+        const apiStatusLabel = document.getElementById('apiStatusLabel');
+        const apiDataElement = document.getElementById('apiData');
+        const userDataElement = document.getElementById('userData');
+        const refreshButton = document.getElementById('refreshButton');
+        const fixButton = document.getElementById('fixButton');
+        const loadingElement = document.getElementById('loading');
+        
+        // Auth State Observer
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                // User is signed in
+                updateAuthStatus('success', 'Authenticated');
+                displayAuthData(user);
+                await checkSubscription(user);
+                await checkApiStatus(user);
+            } else {
+                // User is signed out
+                updateAuthStatus('error', 'Not Authenticated');
+                authDataElement.innerHTML = '<p>Please <a href="/login">log in</a> to check subscription status.</p>';
+                subscriptionDataElement.innerHTML = '<p>Authentication required</p>';
+                apiDataElement.innerHTML = '<p>Authentication required</p>';
+                userDataElement.textContent = 'No user data available';
+            }
+        });
+        
+        // Update Auth Status
+        function updateAuthStatus(status, message) {
+            authStatusLabel.textContent = message;
+            authStatusLabel.className = `status status-${status}`;
+        }
+        
+        // Display Auth Data
+        function displayAuthData(user) {
+            const html = `
+                <p><span class="data-label">User ID:</span> ${user.uid}</p>
+                <p><span class="data-label">Email:</span> ${user.email}</p>
+                <p><span class="data-label">Verified:</span> ${user.emailVerified ? 'Yes' : 'No'}</p>
+            `;
+            authDataElement.innerHTML = html;
+        }
+        
+        // Check Subscription
+        async function checkSubscription(user) {
+            try {
+                // Get user data from Firestore
+                const userDocRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userDocRef);
+                
+                if (!userDoc.exists()) {
+                    updateSubscriptionStatus('error', 'No User Document');
+                    subscriptionDataElement.innerHTML = '<p>User document not found in Firestore</p>';
+                    userDataElement.textContent = 'No user document found';
+                    return;
+                }
+                
+                const userData = userDoc.data();
+                
+                // Update raw data display
+                userDataElement.textContent = JSON.stringify(userData, null, 2);
+                
+                // Check subscription
+                const subscription = userData.subscription || {};
+                const isPremium = subscription.status === 'active';
+                
+                if (isPremium) {
+                    updateSubscriptionStatus('success', 'Premium');
+                    const html = `
+                        <p><span class="data-label">Plan:</span> Premium</p>
+                        <p><span class="data-label">Status:</span> ${subscription.status || 'N/A'}</p>
+                        <p><span class="data-label">Customer ID:</span> ${userData.stripe_customer_id || 'Not found'}</p>
+                        <p><span class="data-label">Subscription ID:</span> ${subscription.stripe_subscription_id || 'Not found'}</p>
+                        <p><span class="data-label">Period End:</span> ${subscription.currentPeriodEnd ? new Date(subscription.currentPeriodEnd * 1000).toLocaleString() : 'N/A'}</p>
+                    `;
+                    subscriptionDataElement.innerHTML = html;
+                } else {
+                    updateSubscriptionStatus('warning', 'Free');
+                    subscriptionDataElement.innerHTML = `
+                        <p>Free plan or inactive subscription</p>
+                        <p><span class="data-label">Status:</span> ${subscription.status || 'Not set'}</p>
+                        <p><span class="data-label">Customer ID:</span> ${userData.stripe_customer_id || 'Not found'}</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error checking subscription:', error);
+                updateSubscriptionStatus('error', 'Error');
+                subscriptionDataElement.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Update Subscription Status
+        function updateSubscriptionStatus(status, message) {
+            subscriptionStatusLabel.textContent = message;
+            subscriptionStatusLabel.className = `status status-${status}`;
+        }
+        
+        // Check API Status
+        async function checkApiStatus(user) {
+            try {
+                const idToken = await user.getIdToken();
+                
+                // Call subscription API
+                const response = await fetch('/api/user/subscription', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                // Update API status
+                if (data.isPremium) {
+                    updateApiStatus('success', 'Premium');
+                } else {
+                    updateApiStatus('warning', 'Free');
+                }
+                
+                // Display API data
+                apiDataElement.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                console.error('Error checking API status:', error);
+                updateApiStatus('error', 'Error');
+                apiDataElement.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Update API Status
+        function updateApiStatus(status, message) {
+            apiStatusLabel.textContent = message;
+            apiStatusLabel.className = `status status-${status}`;
+        }
+        
+        // Refresh Button
+        refreshButton.addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            showLoading(true);
+            
+            try {
+                await checkSubscription(user);
+                await checkApiStatus(user);
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+            } finally {
+                showLoading(false);
+            }
+        });
+        
+        // Fix Button
+        fixButton.addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            showLoading(true);
+            
+            try {
+                const idToken = await user.getIdToken();
+                
+                // Call fix endpoint
+                const response = await fetch('/api/fix-subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Subscription fixed successfully! Refreshing data...');
+                    await checkSubscription(user);
+                    await checkApiStatus(user);
+                } else {
+                    alert(`Failed to fix subscription: ${data.error}`);
+                }
+            } catch (error) {
+                console.error('Error fixing subscription:', error);
+                alert(`Error: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        });
+        
+        // Show/Hide Loading
+        function showLoading(show) {
+            loadingElement.style.display = show ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html> 

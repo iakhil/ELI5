@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Activated - ELI5 Buddy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+    <style>
+        .success-container {
+            max-width: 600px;
+            margin: 100px auto;
+            text-align: center;
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .success-icon {
+            font-size: 64px;
+            color: #00b894;
+            margin-bottom: 20px;
+        }
+        
+        .success-title {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #2d3436;
+        }
+        
+        .success-message {
+            font-size: 16px;
+            color: #636e72;
+            margin-bottom: 30px;
+        }
+        
+        .redirect-message {
+            font-size: 14px;
+            color: #636e72;
+            margin-top: 20px;
+        }
+        
+        .countdown {
+            font-weight: bold;
+            color: #4285f4;
+        }
+        
+        .dashboard-btn {
+            display: inline-block;
+            background-color: #4285f4;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .dashboard-btn:hover {
+            background-color: #3367d6;
+        }
+        
+        .subscription-details {
+            margin-top: 30px;
+            text-align: left;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .subscription-details h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: #2d3436;
+        }
+        
+        .detail-item {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #636e72;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <i class="fas fa-check-circle success-icon"></i>
+        <h1 class="success-title">Subscription Activated!</h1>
+        <p class="success-message">Thank you for subscribing to ELI5 Buddy Premium. Your account has been upgraded and you now have access to all premium features.</p>
+        
+        <div class="subscription-details">
+            <h3>Subscription Details</h3>
+            <div class="detail-item">
+                <span class="detail-label">Plan:</span> Premium
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Price:</span> $4.99/month
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Features:</span> Flashcards, Advanced Explanations, Priority Support
+            </div>
+        </div>
+        
+        <a href="{{ redirect_url }}" class="dashboard-btn">Go to Dashboard</a>
+        
+        <p class="redirect-message">You will be redirected to the dashboard in <span id="countdown" class="countdown">5</span> seconds...</p>
+    </div>
+
+    <script>
+        // Countdown timer
+        let seconds = 5;
+        const countdownElement = document.getElementById('countdown');
+        
+        const interval = setInterval(() => {
+            seconds--;
+            countdownElement.textContent = seconds;
+            
+            if (seconds <= 0) {
+                clearInterval(interval);
+                window.location.href = "{{ redirect_url }}";
+            }
+        }, 1000);
+    </script>
+</body>
+</html> 

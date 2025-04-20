@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELI5 Buddy - Make Learning Simple</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-lightbulb"></i>
+            <h1>ELI5 Buddy</h1>
+        </div>
+        <div class="nav-links">
+            <a href="/pricing" class="nav-link">Pricing</a>
+            <div class="user-section">
+                <span id="userEmail" class="user-email"></span>
+                <button id="logoutButton" class="btn-outline" style="display: none;">Logout</button>
+                <button id="loginButton" class="btn-outline">Login</button>
+                <button id="signupButton" class="btn-primary">Sign Up</button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Make Learning Simple</h1>
+                <p>Get instant, easy-to-understand explanations for any topic. Perfect for students, professionals, and curious minds.</p>
+                <div class="hero-buttons">
+                    <a href="/pricing" class="btn-primary">Get Started</a>
+                    <a href="#features" class="btn-outline">Learn More</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <h2>Why Choose ELI5 Buddy?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-brain"></i>
+                    <h3>Smart Explanations</h3>
+                    <p>Get clear, concise explanations that break down complex topics into simple terms.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-flash"></i>
+                    <h3>Instant Access</h3>
+                    <p>Get explanations instantly through our Chrome extension, right where you need them.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-book"></i>
+                    <h3>Flashcards</h3>
+                    <p>Create and study flashcards to reinforce your learning.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Track Progress</h3>
+                    <p>Monitor your learning journey with detailed statistics and progress tracking.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <h2>Ready to Start Learning?</h2>
+            <p>Join thousands of users who are making learning easier with ELI5 Buddy.</p>
+            <a href="/pricing" class="btn-primary">Get Started Now</a>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>ELI5 Buddy</h3>
+                <p>Making learning simple and accessible for everyone.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="/pricing">Pricing</a>
+                <a href="/dashboard">Dashboard</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <a href="#">Support</a>
+                <a href="#">Email Us</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 ELI5 Buddy. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Custom Scripts -->
+    <script type="module" src="{{ url_for('static', filename='js/firebase-config.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html> 

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ELI5 Buddy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-lightbulb"></i>
+                <h1>ELI5 Buddy</h1>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/dashboard" class="nav-link active">Dashboard</a>
+                <div id="userSection" class="user-section">
+                    <!-- User info will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>My Flashcards</h1>
+                <div class="dashboard-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search flashcards...">
+                    </div>
+                    <select id="sortSelect" class="select-input">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="alphabetical">Alphabetical</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flashcards-grid" id="flashcardsGrid">
+                <!-- Flashcard sets will be inserted here -->
+            </div>
+
+            <div id="emptyState" class="empty-state hidden">
+                <i class="fas fa-clone"></i>
+                <h2>No Flashcards Yet</h2>
+                <p>Install the Chrome extension to start creating flashcards!</p>
+                <a href="#" class="btn btn-primary">Get the Extension</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Flashcard Set Template -->
+    <template id="flashcardSetTemplate">
+        <div class="flashcard-set">
+            <div class="set-header">
+                <h3 class="set-title"></h3>
+                <span class="card-count"></span>
+            </div>
+            <p class="set-description"></p>
+            <div class="set-meta">
+                <span class="created-date"></span>
+                <div class="set-actions">
+                    <button class="icon-button" title="Study">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button class="icon-button" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="icon-button" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Study Mode Modal -->
+    <template id="studyModeTemplate">
+        <div class="modal study-mode">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Study Mode</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="flashcard-container">
+                        <div class="flashcard">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <!-- Question will be inserted here -->
+                                </div>
+                                <div class="flashcard-back">
+                                    <!-- Answer will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="study-controls">
+                        <button class="btn btn-outline" id="prevCard">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <button class="btn btn-primary" id="flipCard">
+                            <i class="fas fa-sync"></i> Flip Card
+                        </button>
+                        <button class="btn btn-outline" id="nextCard">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="study-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <span class="progress-text">Card 1 of 10</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="js/dashboard.js" type="module"></script>
+</body>
+</html> 

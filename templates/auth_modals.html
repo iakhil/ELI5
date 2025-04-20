@@ -1,0 +1,55 @@
+<!-- Login Modal -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Login</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn-primary">Login</button>
+            </div>
+            <div class="form-footer">
+                <p>Don't have an account? <a href="#" id="showSignup">Sign up</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Signup Modal -->
+<div id="signupModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Sign Up</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" required>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn-primary">Sign Up</button>
+            </div>
+            <div class="form-footer">
+                <p>Already have an account? <a href="#" id="showLogin">Login</a></p>
+            </div>
+        </form>
+    </div>
+</div> 

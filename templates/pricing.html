@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.stripe.com https://cdnjs.cloudflare.com https://fonts.gstatic.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src https://fonts.gstatic.com https://cdnjs.cloudflare.com; script-src 'self' https://*.firebaseio.com https://*.googleapis.com https://www.gstatic.com https://js.stripe.com 'unsafe-inline'; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.stripe.com wss://*.firebaseio.com;">
+    <title>ELI5 Buddy Premium</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+    <!-- Stripe -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const stripePublishableKey = '{{ stripe_publishable_key }}';
+    </script>
+    <style>
+        /* Reset default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            line-height: 1.6;
+            color: #343a40;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+            color: #3a86ff;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            color: #343a40;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #343a40;
+            font-weight: 600;
+        }
+
+        .nav-link:hover {
+            color: #3a86ff;
+        }
+
+        /* Main content styles */
+        .pricing-container {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+            flex-grow: 1;
+        }
+
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .pricing-header h1 {
+            font-size: 2.5rem;
+            color: #3a86ff;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-header p {
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            border: 2px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pricing-card.featured {
+            border-color: #3a86ff;
+            transform: scale(1.05);
+            position: relative;
+        }
+
+        .pricing-card.featured::before {
+            content: "Popular";
+            position: absolute;
+            top: -12px;
+            right: 24px;
+            background: #3a86ff;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .pricing-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: #343a40;
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #343a40;
+            margin-bottom: 2rem;
+        }
+
+        .price span {
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: #6c757d;
+        }
+
+        .features {
+            list-style: none;
+            margin: 2rem 0;
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        .features li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #495057;
+        }
+
+        .features i {
+            color: #3a86ff;
+            font-size: 1.1rem;
+            min-width: 1.1rem;
+        }
+
+        .features li.disabled {
+            color: #adb5bd;
+        }
+
+        .features li.disabled i {
+            color: #dc3545;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            width: 100%;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #3a86ff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2a75e0;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            border: 2px solid #3a86ff;
+            color: #3a86ff;
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background: #3a86ff;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+
+            .pricing-card.featured {
+                transform: none;
+            }
+
+            .pricing-container {
+                margin: 2rem auto;
+                padding: 0 1rem;
+            }
+
+            .pricing-header {
+                margin-bottom: 2rem;
+            }
+
+            .pricing-header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Additional styles for user section */
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-email {
+            color: #343a40;
+            font-weight: 600;
+        }
+
+        #logoutButton {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-lightbulb"></i>
+            <h1>ELI5 Buddy</h1>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/dashboard" class="nav-link">Dashboard</a>
+            <div class="user-section">
+                <span id="userEmail" class="user-email"></span>
+                <button id="logoutButton" class="btn-outline">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pricing-container">
+        <div class="pricing-header">
+            <h1>Choose Your Plan</h1>
+            <p>Unlock the full potential of ELI5 Buddy</p>
+        </div>
+        
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h2>Free</h2>
+                <div class="price">$0<span>/month</span></div>
+                <ul class="features">
+                    <li><i class="fas fa-check"></i> Simple explanations</li>
+                    <li><i class="fas fa-check"></i> Basic flashcards</li>
+                    <li><i class="fas fa-check"></i> Chrome extension</li>
+                    <li class="disabled"><i class="fas fa-times"></i> Unlimited flashcards</li>
+                    <li class="disabled"><i class="fas fa-times"></i> Cloud sync</li>
+                </ul>
+                <button class="btn btn-outline">Current Plan</button>
+            </div>
+            
+            <div class="pricing-card featured">
+                <h2>Premium</h2>
+                <div class="price">$4.99<span>/month</span></div>
+                <ul class="features">
+                    <li><i class="fas fa-check"></i> Everything in Free</li>
+                    <li><i class="fas fa-check"></i> Unlimited flashcards</li>
+                    <li><i class="fas fa-check"></i> Cloud sync</li>
+                    <li><i class="fas fa-check"></i> Priority support</li>
+                    <li><i class="fas fa-check"></i> Advanced customization</li>
+                </ul>
+                <button class="btn btn-primary">Upgrade Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script type="module" src="{{ url_for('static', filename='js/firebase-config.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/pricing.js') }}"></script>
+</body>
+</html> 

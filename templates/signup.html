@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.firebaseio.com https://*.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com; script-src 'self' https://*.firebaseio.com https://*.googleapis.com https://www.gstatic.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com;">
+    <title>Sign Up - ELI5 Buddy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+    <style>
+        /* Success Message Overlay */
+        #successOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .success-box {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: popIn 0.4s forwards;
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .success-icon {
+            color: #00b894;
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .success-title {
+            color: #2d3436;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .success-message {
+            color: #636e72;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 184, 148, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #00b894;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .redirect-info {
+            font-size: 0.9rem;
+            color: #636e72;
+        }
+    </style>
+</head>
+<body>
+    <!-- Success Message Overlay -->
+    <div id="successOverlay">
+        <div class="success-box">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h2 class="success-title">Account Created!</h2>
+            <p class="success-message">Your account has been created successfully.</p>
+            <div class="spinner"></div>
+            <p class="redirect-info">You will be redirected to your dashboard shortly...</p>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-lightbulb"></i>
+            <h1>ELI5 Buddy</h1>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/pricing" class="nav-link">Pricing</a>
+        </div>
+    </nav>
+
+    <main class="auth-container">
+        <div class="auth-card">
+            <h2>Sign Up</h2>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn-primary">Sign Up</button>
+                </div>
+                <div class="form-footer">
+                    <p>Already have an account? <a href="/login">Login</a></p>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Firebase SDKs -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+
+    <!-- Custom Scripts -->
+    <script type="module" src="{{ url_for('static', filename='js/firebase-config.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script type="module">
+        // Global function to show success message
+        window.showCustomSuccessMessage = function() {
+            try {
+                // Show the success overlay
+                const overlay = document.getElementById('successOverlay');
+                if (overlay) {
+                    overlay.style.display = 'flex';
+                    document.body.style.overflow = 'hidden'; // Prevent scrolling
+                    
+                    // Redirect after a delay
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 3000);
+                    
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Error showing success message:', error);
+                alert('Account created successfully! Redirecting to dashboard...');
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1000);
+                return true;
+            }
+        };
+    </script>
+</body>
+</html> 

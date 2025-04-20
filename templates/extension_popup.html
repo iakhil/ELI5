@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELI5 Buddy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles/extension.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">ELI5 Buddy</div>
+        <div class="login-status-container">
+            <div id="loginStatus" class="login-status logged-out">Not logged in</div>
+            <span id="userEmail" class="user-email"></span>
+            <span id="premiumBadge" class="premium-badge" style="display: none;">PREMIUM</span>
+        </div>
+    </header>
+
+    <div class="tagline" style="padding: 8px 16px; text-align: center; background-color: #f5f6fa; font-size: 14px;">
+        Simplify complex content with just a click!
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" data-tab="explain">Explain</div>
+        <div class="tab" data-tab="flashcards">Flashcards</div>
+    </div>
+    
+    <div id="explain-content" class="tab-content active">
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">Highlight text on any webpage that you want explained</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">Click the button below to get a simple explanation</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">Read the simplified explanation that even a 5-year-old could understand!</div>
+            </div>
+        </div>
+        
+        <button class="explain-btn" id="explainButton">
+            <i class="fas fa-magic"></i> Explain Like I'm Five!
+        </button>
+        
+        <button id="loginButton" style="display: none; margin-top: 15px; width: 100%;">Login</button>
+        <button id="logoutButton" style="display: none; margin-top: 10px; width: 100%;">Logout</button>
+    </div>
+    
+    <div id="flashcards-content" class="tab-content">
+        <!-- Flashcard content will be generated dynamically with JavaScript -->
+    </div>
+    
+    <div class="footer">
+        Made by Usability Labs
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script type="module" src="/static/js/firebase-config.js"></script>
+    <script type="module" src="/static/js/extension.js"></script>
+    
+    <script>
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    tab.classList.add('active');
+                    const tabName = tab.getAttribute('data-tab');
+                    document.getElementById(`${tabName}-content`).classList.add('active');
+                });
+            });
+            
+            // Explain button functionality
+            const explainButton = document.getElementById('explainButton');
+            if (explainButton) {
+                explainButton.addEventListener('click', () => {
+                    chrome.tabs.executeScript({
+                        code: 'window.getSelection().toString();'
+                    }, function(selection) {
+                        if (!selection || !selection[0]) {
+                            alert('Please highlight text first!');
+                            return;
+                        }
+                        
+                        const text = selection[0];
+                        if (text.length < 10) {
+                            alert('Please select more text (at least 10 characters)');
+                            return;
+                        }
+                        
+                        // For now, use a simple alert. In a real extension, you'd send this to your API
+                        alert(`You selected: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"\n\nExplanation coming soon!`);
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html> 
