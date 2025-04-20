@@ -35,7 +35,7 @@ app.post('/api/explain', async (req, res) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful assistant that explains complex topics in simple terms that a 5-year-old could understand. Keep your explanations concise and under 150 words.'
+            content: 'You are a helpful assistant that explains complex topics in simple terms that a 5-year-old could understand. Keep your explanations concise and under 150 words. DO NOT include any other text or comments. Just the explanation.'
           },
           {
             role: 'user',
