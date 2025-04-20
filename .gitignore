@@ -10,6 +10,14 @@ yarn.lock
 # Environment variables - never commit these!
 .env
 server/.env
+backend/.env
+*/**/.env
+
+# Service account and credential files
+*service_acc*.json
+*service-acc*.json
+*credentials*.json
+*credential*.json
 
 # OS specific files
 .DS_Store

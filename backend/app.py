@@ -9,10 +9,43 @@ from firebase_admin import credentials, firestore
 # Load environment variables
 load_dotenv()
 
-# Initialize Firebase Admin
-cred = credentials.Certificate('firebase-service-account.json')
-firebase_admin.initialize_app(cred)
-db = firestore.client()
+# Initialize Firebase
+def initialize_firebase():
+    """Initialize Firebase with credentials from environment variables or a file."""
+    # Check if GOOGLE_APPLICATION_CREDENTIALS is set to a file path
+    creds_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    
+    if creds_path and os.path.exists(creds_path):
+        # Use the file if it exists
+        cred = credentials.Certificate(creds_path)
+    else:
+        # Otherwise, try to build credentials from environment variables
+        cred_dict = {
+            "type": os.getenv("GCP_TYPE", "service_account"),
+            "project_id": os.getenv("GCP_PROJECT_ID"),
+            "private_key_id": os.getenv("GCP_PRIVATE_KEY_ID"),
+            "private_key": os.getenv("GCP_PRIVATE_KEY", "").replace("\\n", "\n"),
+            "client_email": os.getenv("GCP_CLIENT_EMAIL"),
+            "client_id": os.getenv("GCP_CLIENT_ID"),
+            "auth_uri": os.getenv("GCP_AUTH_URI", "https://accounts.google.com/o/oauth2/auth"),
+            "token_uri": os.getenv("GCP_TOKEN_URI", "https://oauth2.googleapis.com/token"),
+            "auth_provider_x509_cert_url": os.getenv("GCP_AUTH_PROVIDER_X509_CERT_URL", 
+                                                   "https://www.googleapis.com/oauth2/v1/certs"),
+            "client_x509_cert_url": os.getenv("GCP_CLIENT_X509_CERT_URL")
+        }
+        
+        # Validate required fields
+        required_fields = ["project_id", "private_key_id", "private_key", "client_email", "client_id"]
+        missing_fields = [field for field in required_fields if not cred_dict.get(field)]
+        
+        if missing_fields:
+            raise ValueError(f"Missing required credential fields: {', '.join(missing_fields)}")
+        
+        cred = credentials.Certificate(cred_dict)
+    
+    # Initialize Firebase app
+    firebase_admin.initialize_app(cred)
+    return firestore.client()
 
 app = Flask(__name__)
 CORS(app)
@@ -22,6 +55,9 @@ stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 STRIPE_PRICE_ID = os.getenv('STRIPE_PRICE_ID')
 DOMAIN = os.getenv('DOMAIN')
+
+# Initialize Firebase
+db = initialize_firebase()
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
