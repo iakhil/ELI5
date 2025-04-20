@@ -15,7 +15,7 @@ async function generateExplanation(text, sendResponse) {
   console.log('Generating explanation for:', text.substring(0, 30) + '...');
   try {
     // Make request to your proxy server instead of directly to OpenAI
-    const response = await fetch('https://your-proxy-server.com/api/explain', {
+    const response = await fetch('https://eli5-6qbb.onrender.com/api/explain', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
