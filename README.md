@@ -25,6 +25,38 @@ This approach keeps your API key secure and gives you control over usage.
 
 See the [server README](./server/README.md) for detailed instructions on setting up and deploying the proxy server.
 
+#### Deploying to Render
+
+1. **Sign up/login to Render**: Go to [render.com](https://render.com/) and create an account if you don't have one
+
+2. **Create a new Web Service**:
+   - Click "New +" and select "Web Service"
+   - Connect your GitHub repository
+   - Select the repository that contains your ELI5 project
+
+3. **Configure the service**:
+   - **Name**: `eli5-proxy-server` (or whatever you prefer)
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - **Plan**: Free (or select paid if you need more resources)
+
+4. **Add environment variables**:
+   - Under the "Environment" tab, add the following:
+   - `OPENAI_API_KEY`: Your actual OpenAI API key
+   - `PORT`: 10000 (Render will automatically use this for the internal port)
+
+5. **Deploy**:
+   - Click "Create Web Service"
+   - Render will automatically build and deploy your service
+
+6. **Update your extension**:
+   - After successful deployment, Render will provide you with a URL (something like `https://eli5-proxy-server.onrender.com`)
+   - Update your `background.js` file with this URL:
+   ```javascript
+   // In background.js
+   const PROXY_SERVER_URL = 'https://eli5-proxy-server.onrender.com/api';
+   ```
+
 ### Setting up the Chrome Extension
 
 1. Update the proxy server URL in `background.js`:
@@ -89,7 +121,7 @@ MIT License
 ### Setup
 
 1. Clone the repository
-2. Update the `OPENAI_API_KEY` in `background.js` with your own API key
+2. Update the `PROXY_SERVER_URL` in `background.js` with your deployed server URL
 3. Load the extension in Chrome as described in the Installation section
 
 ### Generating Icons

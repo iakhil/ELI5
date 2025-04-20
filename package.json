@@ -1,0 +1,14 @@
+{
+  "name": "eli5-buddy",
+  "version": "1.0.0",
+  "description": "ELI5 Buddy Chrome Extension with Proxy Server",
+  "main": "server/proxy-server.js",
+  "scripts": {
+    "start": "cd server && node proxy-server.js",
+    "dev": "cd server && npm run dev",
+    "postinstall": "cd server && npm install"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+} 
