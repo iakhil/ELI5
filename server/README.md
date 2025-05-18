@@ -9,6 +9,39 @@ This is a simple proxy server for the ELI5 Buddy Chrome extension. It securely h
 * **Cost management**: Helps prevent abuse of your API key
 * **Maintenance**: Allows updating the API key without pushing new extension versions
 
+## API Endpoints
+
+The server provides the following endpoints:
+
+### `/api/explain`
+- **Method**: POST
+- **Purpose**: Explains text in simple terms
+- **Request body**: `{ "text": "Text to explain" }`
+- **Response**: `{ "explanation": "Simple explanation" }`
+
+### `/api/explain-image`
+- **Method**: POST
+- **Purpose**: Directly analyzes and explains images without separate text extraction
+- **Request body**: `{ "imageData": "base64-encoded image data" }`
+- **Response**: `{ "extractedText": "Brief description of image content", "explanation": "Simple explanation of the image" }`
+
+### `/api/extract-and-explain`
+- **Method**: POST
+- **Purpose**: First extracts text from an image, then explains it
+- **Request body**: `{ "imageData": "base64-encoded image data" }`
+- **Response**: `{ "extractedText": "Text extracted from image", "explanation": "Simple explanation of the text" }`
+
+### `/api/flashcards`
+- **Method**: POST
+- **Purpose**: Generates flashcards from text content
+- **Request body**: `{ "text": "Text to create flashcards from", "count": 5, "difficulty": "intermediate" }`
+- **Response**: `{ "flashcards": [{ "front": "Q", "back": "A" }, ...] }`
+
+### `/api/health`
+- **Method**: GET
+- **Purpose**: Checks if the server is running
+- **Response**: `{ "status": "ok", "message": "Proxy server is running" }`
+
 ## Setup Instructions
 
 ### Prerequisites

@@ -44,6 +44,34 @@ if (chrome.contextMenus) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log('Background received message:', message);
     
+    // Capture visible tab as screenshot
+    if (message.action === 'captureVisibleTab') {
+        captureVisibleTab()
+            .then(imageData => {
+                sendResponse({ imageData });
+            })
+            .catch(error => {
+                console.error('Screenshot capture error:', error);
+                sendResponse({ error: error.message || 'Failed to capture screenshot' });
+            });
+        return true; // Keep channel open for async response
+    }
+    
+    // Process and explain image
+    if (message.action === 'explainImage') {
+        processAndExplainImage(message.imageData)
+            .then(response => {
+                sendResponse(response);
+            })
+            .catch(error => {
+                console.error('Image explanation error:', error);
+                sendResponse({ 
+                    error: error.message || 'Failed to process image'
+                });
+            });
+        return true; // Keep channel open for async response
+    }
+    
     // Check authentication status
     if (message.action === 'checkAuth') {
         checkAuthStatus()
@@ -107,6 +135,75 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ success: true });
     }
 });
+
+// Capture current tab as an image
+async function captureVisibleTab() {
+    return new Promise((resolve, reject) => {
+        try {
+            chrome.tabs.captureVisibleTab(
+                null, 
+                { format: 'png', quality: 100 }, 
+                dataUrl => {
+                    if (chrome.runtime.lastError) {
+                        reject(new Error(chrome.runtime.lastError.message));
+                    } else if (!dataUrl) {
+                        reject(new Error('Failed to capture tab image'));
+                    } else {
+                        resolve(dataUrl);
+                    }
+                }
+            );
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+// Process image with OCR and get explanation
+async function processAndExplainImage(imageData) {
+    try {
+        // Get auth token
+        const token = await getAuthToken();
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+        
+        console.log('Sending image data to API for OCR and explanation...');
+        
+        // Call API endpoint to process the image
+        const response = await fetch(`${API_BASE_URL}/api/extract-and-explain`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...headers
+            },
+            body: JSON.stringify({ 
+                imageData 
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('API Error Response:', errorData);
+            throw new Error(errorData.error || `Server error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Log the full API response for debugging
+        console.log('=== API RESPONSE START ===');
+        console.log('Status:', response.status);
+        console.log('Extracted Text:', data.extractedText);
+        console.log('Explanation:', data.explanation);
+        console.log('=== API RESPONSE END ===');
+        
+        return { 
+            explanation: data.explanation,
+            extractedText: data.extractedText
+        };
+    } catch (error) {
+        console.error('Error processing image:', error);
+        throw error;
+    }
+}
 
 // Check if user is authenticated
 async function checkAuthStatus() {

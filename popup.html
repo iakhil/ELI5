@@ -8,6 +8,43 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .button-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .button-container button {
+      flex: 1;
+    }
+    
+    .secondary-button {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(108, 117, 125, 0.2);
+    }
+    
+    .secondary-button:hover {
+      background-color: #5a6268;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(108, 117, 125, 0.3);
+    }
+    
+    .secondary-button i {
+      margin-right: 8px;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -24,13 +61,18 @@
       <div id="explainMode" class="tab-content active">
         <div class="instruction-box">
           <p><i class="fas fa-highlighter"></i> Highlight text on any webpage</p>
-          <p><i class="fas fa-mouse-pointer"></i> Click the button below</p>
+          <p><i class="fas fa-camera"></i> Or capture an area of the screen</p>
           <p><i class="fas fa-magic"></i> Get a simple explanation!</p>
         </div>
         
+        <div class="button-container">
         <button id="eli5Button" class="primary-button">
-          <i class="fas fa-child"></i> Explain Like I'm Five!
+            <i class="fas fa-child"></i> Explain Text
+          </button>
+          <button id="captureButton" class="secondary-button">
+            <i class="fas fa-camera"></i> Capture Area
         </button>
+        </div>
         
         <div class="result-area">
           <div id="loading" class="loading hidden">
@@ -52,7 +94,7 @@
     </main>
     
     <footer>
-      <p>Made by Usability Labs</p>
+      <p>Made by Usability Labs Inc.</p>
     </footer>
   </div>
 
