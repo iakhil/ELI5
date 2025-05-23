@@ -17,18 +17,13 @@
     "128": "images/icon128.png"
   },
   "permissions": [
-    "storage",
     "tabs",
     "activeTab",
     "scripting",
-    "contextMenus",
-    "clipboardWrite",
-    "tabCapture"
+    "clipboardWrite"
   ],
   "host_permissions": [
-    "http://localhost:5001/*",
-    "https://*/*",
-    "file://*/*"
+    "https://eli5-6qbb.onrender.com/*"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self' https://www.gstatic.com/; object-src 'self'"

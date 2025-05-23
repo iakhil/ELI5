@@ -1,4 +1,4 @@
-// ELI5 Buddy - Content Script with area selection
+// ELI5 Buddy - Content Script with area selection (NO FLOATING BUTTON VERSION)
 
 console.log('ELI5 Buddy content script loaded');
 
@@ -8,91 +8,17 @@ let selectionBox = null;
 let startX = 0;
 let startY = 0;
 
-// Make startAreaSelection function available globally
-window.startAreaSelection = startAreaSelection;
-
-// Create the selection button
+// Create the selection button - DISABLED (removed floating button)
 function createSelectionButton() {
-    console.log('Creating selection button...');
-    
-    // Check if we're in a frame
-    if (window !== window.top) {
-        console.log('Running in iframe, not creating button');
-        return;
-    }
-    
-    // Check if button already exists
-    if (document.getElementById('eli5-area-select-button')) {
-        console.log('Button already exists');
-        return;
-    }
-    
-    try {
-        // Create button element with more visible styling
-        const btn = document.createElement('button');
-        btn.id = 'eli5-area-select-button';
-        btn.textContent = '📷 Capture & Explain';
-        
-        // Add styles for high visibility
-        Object.assign(btn.style, {
-            position: 'fixed',
-            bottom: '30px',
-            right: '30px',
-            zIndex: '2147483647',
-            padding: '12px 20px',
-            backgroundColor: '#4285f4',
-            color: 'white',
-            border: 'none',
-            borderRadius: '30px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
-            fontFamily: 'Arial, sans-serif',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-        });
-        
-        // Add hover effect
-        btn.addEventListener('mouseover', function() {
-            Object.assign(btn.style, {
-                backgroundColor: '#3367d6',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 6px 16px rgba(0, 0, 0, 0.5)'
-            });
-        });
-        
-        btn.addEventListener('mouseout', function() {
-            Object.assign(btn.style, {
-                backgroundColor: '#4285f4',
-                transform: 'translateY(0)',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)'
-            });
-        });
-        
-        // Add click event
-        btn.addEventListener('click', function() {
-            console.log('Selection button clicked');
-            startAreaSelection();
-        });
-        
-        // Append to body
-        document.body.appendChild(btn);
-        console.log('✅ Selection button added successfully');
-    } catch (error) {
-        console.error('Error creating selection button:', error);
-    }
+    console.log('Selection button creation DISABLED');
+    // Button creation has been disabled to comply with Chrome Web Store policies
+    return;
 }
 
 // Start the area selection process
 function startAreaSelection() {
     console.log('Starting area selection mode');
     isAreaSelectionActive = true;
-    
-    // Hide the button if it exists
-    const selectionButton = document.getElementById('eli5-area-select-button');
-    if (selectionButton) selectionButton.style.display = 'none';
     
     // First remove any existing overlays if present
     const existingOverlay = document.getElementById('eli5-selection-overlay');
@@ -203,59 +129,24 @@ function handleSelectionEnd(e) {
         return;
     }
     
-    // Add control buttons
-    const controlsElement = document.createElement('div');
-    controlsElement.id = 'eli5-selection-controls';
-    Object.assign(controlsElement.style, {
-        position: 'fixed',
-        display: 'flex',
-        gap: '8px',
-        padding: '10px',
-        backgroundColor: 'white',
-        borderRadius: '5px',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
-        zIndex: '2147483647'
-    });
+    // Instead of showing buttons, directly capture the selected area
+    captureSelectedArea();
+}
+
+// Cancel the area selection
+function cancelAreaSelection() {
+    console.log('Cancelling area selection');
+    isAreaSelectionActive = false;
     
-    // Position the controls below the selection box
-    const boxRect = selectionBox.getBoundingClientRect();
-    controlsElement.style.left = boxRect.left + 'px';
-    controlsElement.style.top = (boxRect.bottom + 10) + 'px';
+    // Remove selection elements
+    const overlay = document.getElementById('eli5-selection-overlay');
+    if (overlay) overlay.remove();
     
-    // Create capture button
-    const captureButton = document.createElement('button');
-    captureButton.textContent = 'Capture & Explain';
-    Object.assign(captureButton.style, {
-        padding: '8px 16px',
-        borderRadius: '4px',
-        fontSize: '14px',
-        cursor: 'pointer',
-        border: 'none',
-        backgroundColor: '#4285f4',
-        color: 'white'
-    });
-    captureButton.addEventListener('click', captureSelectedArea);
+    // Remove controls element if it exists
+    const controls = document.getElementById('eli5-selection-controls');
+    if (controls) controls.remove();
     
-    // Create cancel button
-    const cancelButton = document.createElement('button');
-    cancelButton.textContent = 'Cancel';
-    Object.assign(cancelButton.style, {
-        padding: '8px 16px',
-        borderRadius: '4px',
-        fontSize: '14px',
-        cursor: 'pointer',
-        border: 'none',
-        backgroundColor: '#f1f3f4',
-        color: '#444'
-    });
-    cancelButton.addEventListener('click', cancelAreaSelection);
-    
-    // Add buttons to controls
-    controlsElement.appendChild(captureButton);
-    controlsElement.appendChild(cancelButton);
-    
-    // Add controls to body
-    document.body.appendChild(controlsElement);
+    selectionBox = null;
 }
 
 // Capture the selected area and send for explanation
@@ -297,7 +188,7 @@ function captureSelectedArea() {
         zIndex: '2147483647',
         fontFamily: 'Arial, sans-serif'
     });
-    loadingMessage.textContent = 'Capturing and processing image...';
+    loadingMessage.textContent = 'Processing your selection...';
     document.body.appendChild(loadingMessage);
     
     // Simplified approach: Just ask for the screenshot and do all processing here
@@ -342,7 +233,7 @@ function captureSelectedArea() {
                             zIndex: '2147483647',
                             fontFamily: 'Arial, sans-serif'
                         });
-                        processingMessage.textContent = 'Getting explanation from AI...';
+                        processingMessage.textContent = 'Processing your selection...';
                         document.body.appendChild(processingMessage);
                         
                         // Now send for explanation
@@ -688,46 +579,15 @@ function showError(message, details) {
     }, details ? 8000 : 5000);
 }
 
-// Cancel the area selection
-function cancelAreaSelection() {
-    console.log('Cancelling area selection');
-    isAreaSelectionActive = false;
-    
-    // Remove selection elements
-    const overlay = document.getElementById('eli5-selection-overlay');
-    if (overlay) overlay.remove();
-    
-    // Remove controls element if it exists
-    const controls = document.getElementById('eli5-selection-controls');
-    if (controls) controls.remove();
-    
-    // Show the button again
-    const selectionButton = document.getElementById('eli5-area-select-button');
-    if (selectionButton) selectionButton.style.display = 'flex';
-    
-    selectionBox = null;
-}
-
-// Initialize with multiple approaches to ensure the button appears
+// Initialize with minimal functionality - no floating button
 function initialize() {
-    console.log('Initializing ELI5 Buddy content script');
+    console.log('Initializing ELI5 Buddy content script - NO FLOATING BUTTON VERSION');
     
-    // Create button immediately if the body exists
-    if (document.body) {
-        createSelectionButton();
-    }
+    // NO FLOATING BUTTON - This is explicitly disabled to comply with Chrome Web Store policies
+    // The extension will only operate through the popup interface
     
-    // Also try when DOM is fully loaded
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', createSelectionButton);
-    }
-    
-    // Final fallback on window load
-    window.addEventListener('load', createSelectionButton);
-    
-    // Additional fallback - try again after a delay
-    setTimeout(createSelectionButton, 1000);
-    setTimeout(createSelectionButton, 3000);
+    // We are not creating any buttons or UI elements that float on the page
+    // All functionality is triggered through the extension popup only
 }
 
 // Start initialization
@@ -746,6 +606,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     return true; // Required for async response
 });
+
+// CRITICAL: Expose startAreaSelection to the page context
+window.startAreaSelection = startAreaSelection;
 
 // Function to provide a fallback explanation when the API is down
 function showFallbackExplanation(error) {

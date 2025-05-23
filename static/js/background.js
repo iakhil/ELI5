@@ -1,6 +1,6 @@
 // ELI5 Buddy - Background Script
 
-const API_BASE_URL = 'http://localhost:5001';
+const API_BASE_URL = 'https://eli5-6qbb.onrender.com';
 
 // Listen for extension installation
 chrome.runtime.onInstalled.addListener(details => {

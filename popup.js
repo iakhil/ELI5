@@ -116,28 +116,22 @@ document.addEventListener('DOMContentLoaded', function() {
   // Trigger area selection in the current tab
   async function triggerAreaSelection(tab) {
     try {
-      const result = await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        function: () => {
-          // This will be executed in the context of the page
-          if (typeof startAreaSelection === 'function') {
-            console.log('Starting area selection from popup');
-            startAreaSelection();
-            return true;
-          } else {
-            console.error('startAreaSelection function not found in the page');
-            return false;
-          }
+      // Instead of trying to access the function directly, send a message to the content script
+      chrome.tabs.sendMessage(tab.id, { action: 'startAreaSelection' }, response => {
+        if (chrome.runtime.lastError) {
+          console.error('[popup.js] Error sending message to content script:', chrome.runtime.lastError);
+          showError('Could not start area selection. Try refreshing the page.');
+          return;
+        }
+
+        if (response && response.success) {
+          console.log('[popup.js] Area selection started successfully');
+          // Close the popup
+          window.close();
+        } else {
+          showError('Could not start area selection. Try refreshing the page.');
         }
       });
-      
-      if (!result || !result[0] || result[0].result !== true) {
-        showError('Could not start area selection. Try refreshing the page.');
-        return;
-      }
-      
-      // Close the popup
-      window.close();
     } catch (err) {
       console.error('[popup.js] Error triggering area selection:', err);
       if (chrome.runtime.lastError) {
@@ -255,46 +249,34 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       
-      // First check if content script already initialized the function
+      // First try to send a message to see if content script is already loaded
       try {
-        const result = await chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          function: () => {
-            return typeof startAreaSelection === 'function';
-          }
-        });
-        
-        if (result && result[0] && result[0].result === true) {
-          // The function exists, trigger it
-          await triggerAreaSelection(tab);
-        } else {
-          // Inject the content script first
-          try {
-            await chrome.scripting.executeScript({
+        chrome.tabs.sendMessage(tab.id, { action: 'ping' }, response => {
+          if (chrome.runtime.lastError) {
+            console.log('[popup.js] Content script not yet loaded, injecting it now');
+            
+            // Inject the content script first
+            chrome.scripting.executeScript({
               target: { tabId: tab.id },
               files: ['content.js']
-            });
-            
-            // Wait a bit for the script to initialize
-            setTimeout(async () => {
-              await triggerAreaSelection(tab);
-            }, 500);
-          } catch (injectError) {
-            console.error('[popup.js] Error injecting content script:', injectError);
-            if (chrome.runtime.lastError) {
-              showError(`Error: ${chrome.runtime.lastError.message}`);
-            } else {
+            }).then(() => {
+              // Wait a bit for the script to initialize
+              setTimeout(() => {
+                triggerAreaSelection(tab);
+              }, 500);
+            }).catch(injectError => {
+              console.error('[popup.js] Error injecting content script:', injectError);
               showError('Failed to inject content script. Try refreshing the page.');
-            }
+            });
+          } else {
+            // Content script is already loaded, trigger area selection
+            console.log('[popup.js] Content script already loaded');
+            triggerAreaSelection(tab);
           }
-        }
-      } catch (scriptError) {
-        console.error('[popup.js] Error executing script:', scriptError);
-        if (chrome.runtime.lastError) {
-          showError(`Error: ${chrome.runtime.lastError.message}`);
-        } else {
-          showError('Error checking page compatibility. Try refreshing the page.');
-        }
+        });
+      } catch (err) {
+        console.error('[popup.js] Error in capture button handler:', err);
+        showError(`Error: ${err.message}`);
       }
     } catch (err) {
       console.error('[popup.js] Error in capture button handler:', err);
