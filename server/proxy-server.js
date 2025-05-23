@@ -31,11 +31,11 @@ app.post('/api/explain', async (req, res) => {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful assistant that explains complex topics in simple terms that a 5-year-old could understand. Keep your explanations concise and under 150 words. DO NOT include any other text or comments. Just the explanation.'
+            content: 'You are a helpful assistant that explains complex topics in simple terms while still being accurate and technical. Do not oversimplify, ensure that the explanation covers all the key points. Keep your explanations concise and under 150 words. DO NOT include any other text or comments. Just the explanation.'
           },
           {
             role: 'user',
@@ -174,7 +174,7 @@ app.post('/api/extract-and-explain', async (req, res) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful assistant that analyzes images and explains them in simple terms that a 5-year-old could understand. First identify the key content, then provide a simple explanation in under 150 words. Your response should be in this format: "TEXT CONTENT: [extracted text from image]\n\nEXPLANATION: [simple explanation]". If there is no text in the image, just provide the explanation part.'
+            content: 'You are a helpful assistant that analyzes images and explains them in simple terms while still being accurate and technical. First identify the key content, then provide a simple explanation in under 150 words. Your response should be in this format: "TEXT CONTENT: [extracted text from image]\n\nEXPLANATION: [simple explanation]". If there is no text in the image, just provide the explanation part.'
           },
           {
             role: 'user',
