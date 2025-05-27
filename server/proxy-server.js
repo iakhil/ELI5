@@ -291,7 +291,7 @@ app.post('/api/explain-image', async (req, res) => {
               content: [
                 {
                   type: 'text',
-                  text: 'Explain this image in simple terms that a 5-year-old would understand.'
+                  text: 'Explain this image in simple terms. Do not oversimplify, ensure that the explanation covers all the key points and is accurate and technical.'
                 },
                 {
                   type: 'image_url',
@@ -302,7 +302,7 @@ app.post('/api/explain-image', async (req, res) => {
               ]
             }
           ],
-          max_tokens: 300
+          max_tokens: 500
         },
         {
           headers: {
