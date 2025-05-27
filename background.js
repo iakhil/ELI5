@@ -2,12 +2,6 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('Received message in background:', request.action);
   
-  // Add test API function
-  if (request.action === 'testApi') {
-    testApiConnection(sendResponse);
-    return true; // Keep the message channel open for async response
-  }
-  
   // Add API health check
   if (request.action === 'checkApiHealth') {
     checkApiHealth(sendResponse);
@@ -50,7 +44,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           console.log('Server is healthy, attempting API call');
           
           try {
-            const response = await fetch('https://eli5-6qbb.onrender.com/api/extract-and-explain', {
+            const response = await fetch('https://eli5-6qbb.onrender.com/api/explain-image', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
@@ -147,8 +141,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   
   // Handle text-based explanation requests
   if (request.action === 'getExplanation' && request.text) {
-    generateExplanation(request.text, sendResponse);
-    return true; // Keep the message channel open for async response
+  generateExplanation(request.text, sendResponse);
+  return true; // Keep the message channel open for async response
   }
   
   // If we get here, neither text nor image data was provided
@@ -523,7 +517,7 @@ async function generateExplanation(text, sendResponse) {
       });
       return;
     }
-    
+
     // Clean the response of any non-JSON characters before parsing
     let cleanedResponse = responseText.trim();
     
@@ -606,94 +600,6 @@ async function generateExplanation(text, sendResponse) {
     sendResponse({
       explanation: fallbackExplanation,
       isLocalFallback: true
-    });
-  }
-}
-
-// Function to directly test the API connection
-async function testApiConnection(sendResponse) {
-  console.log('Testing API connection directly...');
-  
-  try {
-    // First make a simple health check
-    console.log('Testing /api/health endpoint...');
-    try {
-      const healthCheck = await fetch('https://eli5-6qbb.onrender.com/api/health', {
-        method: 'GET',
-        timeout: 5000
-      });
-      
-      console.log('Health check status:', healthCheck.status);
-      const healthText = await healthCheck.text();
-      console.log('Health response:', healthText);
-      
-      if (!healthCheck.ok) {
-        console.error('Health check failed with status:', healthCheck.status);
-        sendResponse({ 
-          success: false,
-          error: `Health check failed with status: ${healthCheck.status}`,
-          response: healthText
-        });
-        return;
-      }
-    } catch (healthError) {
-      console.error('Health check failed with error:', healthError);
-      sendResponse({ 
-        success: false,
-        error: `Health check error: ${healthError.message}`
-      });
-      return;
-    }
-    
-    // Now test the text explanation endpoint with minimal data
-    console.log('Testing /api/explain endpoint with minimal data...');
-    try {
-      const explainResponse = await fetch('https://eli5-6qbb.onrender.com/api/explain', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          text: 'This is a test message to verify the API is working correctly.'
-        }),
-        timeout: 10000
-      });
-      
-      console.log('Explain test status:', explainResponse.status);
-      const explainText = await explainResponse.text();
-      console.log('Full explain response:', explainText);
-      
-      // Try to parse the response
-      let jsonData = null;
-      let parseError = null;
-      try {
-        jsonData = JSON.parse(explainText);
-        console.log('Successfully parsed response as JSON:', JSON.stringify(jsonData, null, 2));
-      } catch (err) {
-        parseError = err.message;
-        console.error('Failed to parse response as JSON:', err);
-      }
-      
-      sendResponse({
-        success: explainResponse.ok && jsonData !== null,
-        status: explainResponse.status,
-        responseText: explainText.substring(0, 500), // First 500 chars
-        parsedData: jsonData,
-        parseError: parseError,
-        contentType: explainResponse.headers.get('content-type')
-      });
-    } catch (explainError) {
-      console.error('Explain test failed with error:', explainError);
-      sendResponse({ 
-        success: false,
-        error: `Explain API test error: ${explainError.message}`
-      });
-    }
-  } catch (error) {
-    console.error('Test API connection failed:', error);
-    sendResponse({ 
-      success: false,
-      error: `General error: ${error.message}`
     });
   }
 }

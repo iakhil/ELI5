@@ -20,7 +20,7 @@ function initialize() {
 // Make sure DOM is ready before initializing
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initialize);
-} else {
+    } else {
     initialize();
 }
 
